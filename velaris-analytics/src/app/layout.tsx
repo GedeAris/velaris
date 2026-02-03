@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "Velaris Analytics",
   description:
     "Velaris Analytics builds premium CRM systems, data analytics, BI dashboards, and business automation.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
