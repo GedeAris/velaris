@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PortfolioStatus {
+  LIVE
+  INTERNAL
+  PROTOTYPE
+}
+
+enum PortfolioCategory {
+  CRM
+  ANALYTICS
+  AUTOMATION
+  DASHBOARD
+  WEB_APP
+  INTERNAL_SYSTEM
+}
+
+model PortfolioItem {
+  id           String            @id @default(cuid())
+  title        String
+  description  String
+  thumbnailUrl String?
+  videoUrl     String?
+  category     PortfolioCategory
+  tags         Json
+  status       PortfolioStatus   @default(LIVE)
+  isPublished  Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([isPublished, category])
+  @@index([createdAt])
+}
+
+model AgreementSubmission {
+  id                         String   @id @default(cuid())
+  clientName                 String
+  companyName                String
+  email                      String
+  whatsapp                   String
+  projectName                String?
+  agreedPaymentTerms         Boolean
+  understoodScopeChangeImpact Boolean
+  signatureName              String
+  approvedProceed            Boolean
+  signedDate                 String
+  createdAt                  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+}
