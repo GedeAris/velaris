@@ -20,7 +20,7 @@ export function FinalCta() {
             </p>
             <div className="mt-10 flex justify-center">
               <ActionButton
-                href={getWhatsAppHref("Hi Velaris Analytics — I’m ready to start.")}
+                href={getWhatsAppHref("Halo Velaris Analytics. Saya tertarik dengan layanan CRM & data analytics-nya. Boleh diskusi sebentar terkait kebutuhan bisnis saya? Terima kasih")}
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="primary"

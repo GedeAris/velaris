@@ -246,10 +246,6 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
             {filtered.map((item, idx) => {
               const imageLoaded = Boolean(loadedImages[item.id]);
               const delayMs = Math.min(idx, 9) * 65;
-              const cardVideoUrl = item.videoUrl ? normalizePublicUrl(item.videoUrl) : "";
-              const cardHasDirectVideo = cardVideoUrl
-                ? isDirectVideoFileUrl(cardVideoUrl)
-                : false;
               const cardThumbnailUrl = item.thumbnailUrl
                 ? normalizePublicUrl(item.thumbnailUrl)
                 : "/logo.png";
@@ -272,42 +268,26 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
                       <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_30%_20%,rgb(var(--v-cyan)_/_0.16),transparent_55%)] opacity-90" />
                       <div className="absolute inset-0 bg-[radial-gradient(520px_circle_at_80%_70%,rgb(var(--v-mint)_/_0.12),transparent_60%)] opacity-90" />
                       <div className="relative aspect-[16/10]">
-                        {cardVideoUrl && cardHasDirectVideo ? (
-                          <video
-                            aria-hidden="true"
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            preload="metadata"
-                            className="absolute inset-0 h-full w-full object-cover opacity-90"
-                          >
-                            <source src={cardVideoUrl} />
-                          </video>
-                        ) : (
-                          <>
-                            <div
-                              aria-hidden="true"
-                              className={[
-                                "absolute inset-0 velaris-skeleton",
-                                "transition-opacity duration-700 ease-out",
-                                imageLoaded ? "opacity-0" : "opacity-100",
-                              ].join(" ")}
-                            />
-                            <Image
-                              src={cardThumbnailUrl}
-                              alt={item.title}
-                              fill
-                              sizes="(max-width: 768px) 100vw, 33vw"
-                              className={[
-                                "object-cover transition-opacity duration-700 ease-out",
-                                imageLoaded ? "opacity-90" : "opacity-0",
-                              ].join(" ")}
-                              priority={idx < 3}
-                              onLoadingComplete={() => markImageLoaded(item.id)}
-                            />
-                          </>
-                        )}
+                        <div
+                          aria-hidden="true"
+                          className={[
+                            "absolute inset-0 velaris-skeleton",
+                            "transition-opacity duration-700 ease-out",
+                            imageLoaded ? "opacity-0" : "opacity-100",
+                          ].join(" ")}
+                        />
+                        <Image
+                          src={cardThumbnailUrl}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className={[
+                            "object-cover transition-opacity duration-700 ease-out",
+                            imageLoaded ? "opacity-90" : "opacity-0",
+                          ].join(" ")}
+                          priority={idx < 3}
+                          onLoadingComplete={() => markImageLoaded(item.id)}
+                        />
                       </div>
                     </div>
 
