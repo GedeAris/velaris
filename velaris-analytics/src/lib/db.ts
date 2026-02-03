@@ -251,29 +251,37 @@ export async function listPublishedPortfolioItems(): Promise<
       .slice()
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
-  const db = getDb();
-  const items = await db.portfolioItem.findMany({
-    where: { isPublished: true },
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const db = getDb();
+    const items = await db.portfolioItem.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: "desc" },
+    });
 
-  return items.map((item: DbPortfolioItemRow) => {
-    const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
+    return items.map((item: DbPortfolioItemRow) => {
+      const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
 
-    return {
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      thumbnailUrl: item.thumbnailUrl ?? null,
-      videoUrl: item.videoUrl ?? null,
-      category: String(item.category),
-      tags,
-      status: String(item.status),
-      isPublished: item.isPublished,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    };
-  });
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        thumbnailUrl: item.thumbnailUrl ?? null,
+        videoUrl: item.videoUrl ?? null,
+        category: String(item.category),
+        tags,
+        status: String(item.status),
+        isPublished: item.isPublished,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      };
+    });
+  } catch {
+    ensureMemoryPortfolioSeeded();
+    return getMemoryPortfolioStore()
+      .filter((item) => item.isPublished)
+      .slice()
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
 }
 
 export async function listAllPortfolioItems(): Promise<PortfolioItemRecord[]> {
@@ -283,12 +291,49 @@ export async function listAllPortfolioItems(): Promise<PortfolioItemRecord[]> {
       .slice()
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
-  const db = getDb();
-  const items = await db.portfolioItem.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const db = getDb();
+    const items = await db.portfolioItem.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
-  return items.map((item: DbPortfolioItemRow) => {
+    return items.map((item: DbPortfolioItemRow) => {
+      const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
+
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        thumbnailUrl: item.thumbnailUrl ?? null,
+        videoUrl: item.videoUrl ?? null,
+        category: String(item.category),
+        tags,
+        status: String(item.status),
+        isPublished: item.isPublished,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      };
+    });
+  } catch {
+    ensureMemoryPortfolioSeeded();
+    return getMemoryPortfolioStore()
+      .slice()
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+}
+
+export async function getPortfolioItem(
+  id: string
+): Promise<PortfolioItemRecord | null> {
+  if (!hasDatabaseUrl()) {
+    ensureMemoryPortfolioSeeded();
+    return getMemoryPortfolioStore().find((item) => item.id === id) ?? null;
+  }
+  try {
+    const db = getDb();
+    const item = await db.portfolioItem.findUnique({ where: { id } });
+    if (!item) return null;
+
     const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
 
     return {
@@ -304,35 +349,10 @@ export async function listAllPortfolioItems(): Promise<PortfolioItemRecord[]> {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     };
-  });
-}
-
-export async function getPortfolioItem(
-  id: string
-): Promise<PortfolioItemRecord | null> {
-  if (!hasDatabaseUrl()) {
+  } catch {
     ensureMemoryPortfolioSeeded();
     return getMemoryPortfolioStore().find((item) => item.id === id) ?? null;
   }
-  const db = getDb();
-  const item = await db.portfolioItem.findUnique({ where: { id } });
-  if (!item) return null;
-
-  const tags = Array.isArray(item.tags) ? (item.tags as string[]) : [];
-
-  return {
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    thumbnailUrl: item.thumbnailUrl ?? null,
-    videoUrl: item.videoUrl ?? null,
-    category: String(item.category),
-    tags,
-    status: String(item.status),
-    isPublished: item.isPublished,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
-  };
 }
 
 export async function createPortfolioItem(input: {

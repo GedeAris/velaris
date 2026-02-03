@@ -86,6 +86,7 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
   const [active, setActive] = useState<PortfolioClientItem | null>(null);
   const [gridEpoch, setGridEpoch] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Record<string, true>>({});
+  const [failedVideos, setFailedVideos] = useState<Record<string, true>>({});
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -124,6 +125,10 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
 
   const markImageLoaded = (id: string) => {
     setLoadedImages((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+  };
+
+  const markVideoFailed = (id: string) => {
+    setFailedVideos((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
   };
 
   const categories = useMemo(() => {
@@ -246,6 +251,14 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
             {filtered.map((item, idx) => {
               const imageLoaded = Boolean(loadedImages[item.id]);
               const delayMs = Math.min(idx, 9) * 65;
+              const cardVideoUrl = item.videoUrl ? normalizePublicUrl(item.videoUrl) : "";
+              const cardHasDirectVideo = cardVideoUrl
+                ? isDirectVideoFileUrl(cardVideoUrl)
+                : false;
+              const cardUseVideo =
+                Boolean(cardVideoUrl) &&
+                cardHasDirectVideo &&
+                !failedVideos[item.id];
               const cardThumbnailUrl = item.thumbnailUrl
                 ? normalizePublicUrl(item.thumbnailUrl)
                 : "/logo.png";
@@ -268,26 +281,44 @@ export function PortfolioClient({ items }: { items: PortfolioClientItem[] }) {
                       <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_30%_20%,rgb(var(--v-cyan)_/_0.16),transparent_55%)] opacity-90" />
                       <div className="absolute inset-0 bg-[radial-gradient(520px_circle_at_80%_70%,rgb(var(--v-mint)_/_0.12),transparent_60%)] opacity-90" />
                       <div className="relative aspect-[16/10]">
-                        <div
-                          aria-hidden="true"
-                          className={[
-                            "absolute inset-0 velaris-skeleton",
-                            "transition-opacity duration-700 ease-out",
-                            imageLoaded ? "opacity-0" : "opacity-100",
-                          ].join(" ")}
-                        />
-                        <Image
-                          src={cardThumbnailUrl}
-                          alt={item.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className={[
-                            "object-cover transition-opacity duration-700 ease-out",
-                            imageLoaded ? "opacity-90" : "opacity-0",
-                          ].join(" ")}
-                          priority={idx < 3}
-                          onLoadingComplete={() => markImageLoaded(item.id)}
-                        />
+                        {cardUseVideo ? (
+                          <video
+                            aria-hidden="true"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            poster={cardThumbnailUrl}
+                            className="absolute inset-0 h-full w-full object-cover opacity-90"
+                            onError={() => markVideoFailed(item.id)}
+                          >
+                            <source src={cardVideoUrl} type="video/mp4" />
+                          </video>
+                        ) : (
+                          <>
+                            <div
+                              aria-hidden="true"
+                              className={[
+                                "absolute inset-0 velaris-skeleton",
+                                "transition-opacity duration-700 ease-out",
+                                imageLoaded ? "opacity-0" : "opacity-100",
+                              ].join(" ")}
+                            />
+                            <Image
+                              src={cardThumbnailUrl}
+                              alt={item.title}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              className={[
+                                "object-cover transition-opacity duration-700 ease-out",
+                                imageLoaded ? "opacity-90" : "opacity-0",
+                              ].join(" ")}
+                              priority={idx < 3}
+                              onLoadingComplete={() => markImageLoaded(item.id)}
+                            />
+                          </>
+                        )}
                       </div>
                     </div>
 
