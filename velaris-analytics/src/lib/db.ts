@@ -139,10 +139,113 @@ export type PortfolioListItem = Awaited<
   ReturnType<typeof listPublishedPortfolioItems>
 >[number];
 
+function ensureMemoryPortfolioSeeded() {
+  const store = getMemoryPortfolioStore();
+  if (store.length) return;
+
+  const now = Date.now();
+  const seed = (input: Omit<PortfolioItemRecord, "createdAt" | "updatedAt"> & { createdAtOffsetMs: number }) => {
+    const createdAt = new Date(now - input.createdAtOffsetMs);
+    const record: PortfolioItemRecord = {
+      id: input.id,
+      title: input.title,
+      description: input.description,
+      thumbnailUrl: input.thumbnailUrl,
+      videoUrl: input.videoUrl,
+      category: input.category,
+      tags: input.tags,
+      status: input.status,
+      isPublished: input.isPublished,
+      createdAt,
+      updatedAt: createdAt,
+    };
+    store.push(record);
+  };
+
+  seed({
+    id: "seed-bps",
+    title: "BPS Insights Dashboard",
+    description: "A calm, metrics-first dashboard built for executive visibility and fast decisions.",
+    thumbnailUrl: null,
+    videoUrl: "/BPS.mp4",
+    category: "DASHBOARD",
+    tags: ["Dashboard", "Analytics", "KPI"],
+    status: "LIVE",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 18,
+  });
+
+  seed({
+    id: "seed-market",
+    title: "Market Performance Analytics",
+    description: "A reporting workspace that connects pipeline, revenue, and customer health into one view.",
+    thumbnailUrl: null,
+    videoUrl: "/Market.mp4",
+    category: "ANALYTICS",
+    tags: ["Analytics", "BI", "Reporting"],
+    status: "LIVE",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 14,
+  });
+
+  seed({
+    id: "seed-aftersales",
+    title: "Aftersales CRM Workspace",
+    description: "A CRM flow that keeps support, follow-ups, and renewals organized and measurable.",
+    thumbnailUrl: null,
+    videoUrl: "/aftersales.mp4",
+    category: "CRM",
+    tags: ["CRM", "Operations"],
+    status: "LIVE",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 11,
+  });
+
+  seed({
+    id: "seed-geomapping",
+    title: "Geo Mapping Intelligence",
+    description: "A location-aware view for planning territory coverage and field execution.",
+    thumbnailUrl: null,
+    videoUrl: "/geomapping.mp4",
+    category: "ANALYTICS",
+    tags: ["Geo", "Mapping", "Planning"],
+    status: "PROTOTYPE",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 9,
+  });
+
+  seed({
+    id: "seed-kpi",
+    title: "KPI Monitoring Suite",
+    description: "A lightweight KPI monitor with quick drilldowns and a clean signal-to-noise ratio.",
+    thumbnailUrl: null,
+    videoUrl: "/kpi.mp4",
+    category: "DASHBOARD",
+    tags: ["KPI", "Monitoring"],
+    status: "LIVE",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 7,
+  });
+
+  seed({
+    id: "seed-mayung",
+    title: "Web App Delivery Preview",
+    description: "A polished frontend flow focused on speed, clarity, and high-quality interactions.",
+    thumbnailUrl: null,
+    videoUrl: "/mayung.mp4",
+    category: "WEB_APP",
+    tags: ["Web App", "UI"],
+    status: "INTERNAL",
+    isPublished: true,
+    createdAtOffsetMs: 1000 * 60 * 60 * 24 * 4,
+  });
+}
+
 export async function listPublishedPortfolioItems(): Promise<
   PortfolioItemRecord[]
 > {
   if (!hasDatabaseUrl()) {
+    ensureMemoryPortfolioSeeded();
     return getMemoryPortfolioStore()
       .filter((item) => item.isPublished)
       .slice()
@@ -175,6 +278,7 @@ export async function listPublishedPortfolioItems(): Promise<
 
 export async function listAllPortfolioItems(): Promise<PortfolioItemRecord[]> {
   if (!hasDatabaseUrl()) {
+    ensureMemoryPortfolioSeeded();
     return getMemoryPortfolioStore()
       .slice()
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -207,6 +311,7 @@ export async function getPortfolioItem(
   id: string
 ): Promise<PortfolioItemRecord | null> {
   if (!hasDatabaseUrl()) {
+    ensureMemoryPortfolioSeeded();
     return getMemoryPortfolioStore().find((item) => item.id === id) ?? null;
   }
   const db = getDb();
