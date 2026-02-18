@@ -78,6 +78,29 @@
   }
 }
 
+@keyframes velaris-agreement-idle {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.98);
+    filter: blur(14px);
+  }
+  62% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.98);
+    filter: blur(14px);
+  }
+  76% {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0) scale(1.05);
+    filter: blur(18px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1.02);
+    filter: blur(14px);
+  }
+}
+
 @keyframes velaris-particle-drift {
   0% {
     transform: translate3d(0, 0, 0);
@@ -323,6 +346,37 @@
   box-shadow: 0 0 0 1px rgb(var(--v-cyan) / 0.08),
     0 0 34px -22px rgb(var(--v-cyan) / 0.55);
   opacity: 0.55;
+}
+
+.velaris-agreement-idle::before {
+  content: "";
+  position: absolute;
+  inset: -22% -14%;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 40% 50%,
+    rgb(var(--v-cyan) / 0.34),
+    rgb(var(--v-mint) / 0.16) 38%,
+    transparent 66%
+  );
+  opacity: 0;
+  filter: blur(14px);
+  transform: translate3d(0, 0, 0) scale(0.98);
+  animation: velaris-agreement-idle 5200ms var(--velaris-ease) infinite;
+}
+
+.velaris-agreement-idle:hover::before,
+.velaris-agreement-idle:focus-visible::before {
+  animation: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velaris-agreement-idle::before {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 .velaris-btn-secondary:hover::after {

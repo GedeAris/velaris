@@ -92,7 +92,7 @@ export function Hero() {
                   href="/project-agreement"
                   variant="secondary"
                   size="lg"
-                  className="group"
+                  className="group velaris-agreement-idle"
                 >
                   <span className="inline-flex items-center gap-3 whitespace-nowrap">
                     <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition group-hover:bg-white/8 group-hover:ring-white/15">
